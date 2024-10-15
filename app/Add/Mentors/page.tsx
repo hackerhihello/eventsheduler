@@ -11,12 +11,20 @@ import {
   deleteMentor,
 } from "../../api/mentor"; // Import API functions
 
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  password: string;
+  tech: string;
+}
+
 const Mentor = () => {
-  const [users, setUsers] = useState([]);
-  const [editingUser, setEditingUser] = useState(null);
-  const [viewingUser, setViewingUser] = useState(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [newUser, setNewUser] = useState({
+  const [newUser, setNewUser] = useState<Omit<User, '_id'>>({
     name: "",
     email: "",
     password: "",
@@ -39,19 +47,15 @@ const Mentor = () => {
     loadUsers();
   }, []);
 
-  const validatePassword = (password) => {
-    if (password.length < 8)
-      return "Password must be at least 8 characters long.";
-    if (!/[A-Z]/.test(password))
-      return "Password must contain at least one uppercase letter.";
-    if (!/[a-z]/.test(password))
-      return "Password must contain at least one lowercase letter.";
-    if (!/\d/.test(password))
-      return "Password must contain at least one number.";
+  const validatePassword = (password: string) => {
+    if (password.length < 8) return "Password must be at least 8 characters long.";
+    if (!/[A-Z]/.test(password)) return "Password must contain at least one uppercase letter.";
+    if (!/[a-z]/.test(password)) return "Password must contain at least one lowercase letter.";
+    if (!/\d/.test(password)) return "Password must contain at least one number.";
     return "";
   };
 
-  const validateEmail = (email) => {
+  const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return "Please enter a valid email address.";
@@ -59,7 +63,7 @@ const Mentor = () => {
     return "";
   };
 
-  const handleEdit = (user) => {
+  const handleEdit = (user: User) => {
     setEditingUser(user);
   };
 
@@ -85,17 +89,17 @@ const Mentor = () => {
     setEditingUser(null);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     try {
       await deleteMentor(id);
-      setUsers((prevUsers) => prevUsers.filter((u) => u._id !== id)); // Use _id if using MongoDB
+      setUsers((prevUsers) => prevUsers.filter((u) => u._id !== id));
     } catch (error) {
       console.error('Error deleting mentor:', error);
       alert('Failed to delete mentor. Please try again.');
     }
   };
 
-  const handleView = (user) => {
+  const handleView = (user: User) => {
     setViewingUser(user);
   };
 
@@ -114,7 +118,7 @@ const Mentor = () => {
 
     const addedUser = await createMentor(newUser);
     setUsers((prevUsers) => [...prevUsers, addedUser]);
-    setNewUser({ name: "", email: "", password: "", tech: "" }); // Reset new user state after adding
+    setNewUser({ name: "", email: "", password: "", tech: "" });
   };
 
   const backButtonStyle = `
@@ -182,7 +186,6 @@ const Mentor = () => {
               </span>
             </div>
 
-            {/* Dropdown for Tech */}
             <div className="relative">
               <select
                 value={newUser.tech}
@@ -220,7 +223,7 @@ const Mentor = () => {
         </thead>
         <tbody>
           {users.map((user, index) => (
-            <tr key={user.id}>
+            <tr key={user._id}>
               <td className="p-2 border border-gray-300">{index + 1}</td>
               <td className="p-2 border border-gray-300">{user.tech}</td>
               <td className="p-2 border border-gray-300">{user.name}</td>
@@ -304,7 +307,6 @@ const Mentor = () => {
               </div>
               {passwordError && <p className="text-red-500">{passwordError}</p>}
               
-              {/* Dropdown for Tech */}
               <div className="relative">
                 <select
                   value={editingUser.tech}
@@ -360,4 +362,4 @@ const Mentor = () => {
   );
 };
 
-export default Mentor;
+export default Mentor;  
