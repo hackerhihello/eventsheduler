@@ -10,15 +10,22 @@ import {
   deleteCoAdmin,
 } from '../../api/coAdmin'; // Adjust the import based on your file structure
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string; // Include this if you need to show the password
+}
+
 const CoAdmin = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [isEditing, setIsEditing] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState<{ [key: number]: boolean }>({});
-  const [viewUser, setViewUser] = useState(null);
+  const [viewUser, setViewUser] = useState<User | null>(null);
 
   // Fetch all co-admins on component mount
   useEffect(() => {
@@ -165,7 +172,7 @@ const CoAdmin = () => {
                   className="bg-green-500 text-white px-3 py-1 rounded mr-2"
                   onClick={() => {
                     setIsEditing(true);
-                    setCurrentUserId(user._id);
+                    setCurrentUserId(user.id);
                     setForm(user);
                   }}
                 >
@@ -173,7 +180,7 @@ const CoAdmin = () => {
                 </button>
                 <button
                   className="bg-red-500 text-white px-3 py-1 rounded"
-                  onClick={() => handleDeleteUser(user._id)}
+                  onClick={() => handleDeleteUser(user.id)}
                 >
                   Delete
                 </button>
