@@ -33,11 +33,11 @@ const CoAdmin = () => {
     fetchUsers();
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const togglePasswordVisibility = (index) => {
+  const togglePasswordVisibility = (index: number) => {
     setShowPassword((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
@@ -76,7 +76,7 @@ const CoAdmin = () => {
     }
   };
 
-  const handleDeleteUser = async (id) => {
+  const handleDeleteUser = async (id: string) => {
     try {
       await deleteCoAdmin(id);
       setUsers(users.filter((user) => user.id !== id));
