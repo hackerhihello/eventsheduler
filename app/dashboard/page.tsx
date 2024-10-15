@@ -1,129 +1,99 @@
-  "use client";
-  import React, { useState, useEffect } from "react";
-  import Sidebar from "../Sidebar"; // Ensure this points to your Sidebar component
-  import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    Tooltip,
-    CartesianGrid
-  } from "recharts";
-  import Calendar from "react-calendar";
-  import 'react-calendar/dist/Calendar.css';
-  import { useRouter } from "next/navigation";
+"use client";
+import React, { useState, useEffect } from "react";
+import Sidebar from "../Sidebar";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
+import Calendar from "react-calendar";
+import 'react-calendar/dist/Calendar.css';
+import { fetchUsers } from "../api/userapi"; // Adjust the import path
+import { fetchMentors } from "../api/mentor"; // Adjust the import path
+import { fetchCoAdmins } from "../api/coAdmin"; // Adjust the import path
+import { getEvents } from "../api/events"; // Adjust the import path
 
-  const AdminDashboard: React.FC = () => {
-    const [users, setUsers] = useState<any[]>([]);
-    const [pendingRequests, setPendingRequests] = useState<any[]>([]);
-    const [calendarValue, setCalendarValue] = useState(new Date());
-    const router = useRouter();
+const AdminDashboard: React.FC = () => {
+  const [users, setUsers] = useState<any[]>([]);
+  const [mentors, setMentors] = useState<any[]>([]);
+  const [coAdmins, setCoAdmins] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [calendarValue, setCalendarValue] = useState(new Date());
+  const token = "YOUR_AUTH_TOKEN"; // Replace with actual token management
 
-    useEffect(() => {
-      const token = document.cookie.split('; ').find(row => row.startsWith('authToken'));
-      const userData = localStorage.getItem("user");
-  
-      if (!token || !userData) {
-        // Redirect to login if token or user data is missing
-        router.push("/login");
-      } else {
-        setUsers(JSON.parse(userData)); // Set the user if available
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const usersData = await fetchUsers();
+        const mentorsData = await fetchMentors();
+        const coAdminsData = await fetchCoAdmins();
+        const eventsData = await getEvents(token, "YOUR_USER_ID"); // Replace with actual user ID
+
+        setUsers(usersData);
+        setMentors(mentorsData);
+        setCoAdmins(coAdminsData);
+        setEvents(eventsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    }, [router]);
+    };
 
-    useEffect(() => {
-      // Fetch users and requests from an API (dummy data here)
-      const fetchUsers = async () => {
-        const fetchedUsers = await new Promise(resolve =>
-          setTimeout(() => resolve([
-            { name: "John Doe", role: "Admin" },
-            { name: "Jane Smith", role: "User" },
-          ]), 1000)
-        );
-        setUsers(fetchedUsers as any);
-      };
+    fetchData();
+  }, [token]);
 
-      fetchUsers();
+  const data = [
+    { name: "Jan", users: users.length },
+    { name: "Feb", users: users.length + 10 }, // Example data
+    { name: "Mar", users: users.length + 20 }, // Example data
+  ];
 
-      // Example pending requests
-      setPendingRequests([
-        { user: "Alice Johnson", position: "Frontend Developer", date: "Sep 24, 2024", status: "Pending" },
-        { user: "Bob Brown", position: "SQL Developer", date: "Sep 30, 2024", status: "Approved" },
-      ]);
-    }, []);
+  return (
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-grow ml-64 p-6 bg-gray-100 min-h-screen">
+        <h1 className="text-2xl font-bold mb-4 text-center">Admin Dashboard</h1>
 
-    const data = [
-      { name: "Jan", users: 30 },
-      { name: "Feb", users: 40 },
-      { name: "Mar", users: 50 },
-    ];
-
-    return (
-      <div className="flex">
-        <Sidebar />
-        <div className="flex-grow ml-64 ml-4 p-6" style={{marginLeft:'250px'}}> {/* Add mr-4 for right margin */}
-        {/* <div className="flex-grow bg-gray-100 min-h-screen p-4"> */}
-          <h1 className="text-2xl font-bold mb-4 text-center">Admin Dashboard</h1>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white p-4 rounded-md shadow-md">
-              <h3 className="text-lg font-medium mb-2">Total Users</h3>
-              <p className="text-2xl">{users.length}</p>
-            </div>
-            <div className="bg-white p-4 rounded-md shadow-md">
-              <h3 className="text-lg font-medium mb-2">Pending Requests</h3>
-              <p className="text-2xl">{pendingRequests.length}</p>
-            </div>
-            <div className="bg-white p-4 rounded-md shadow-md">
-              <h3 className="text-lg font-medium mb-2">Interviews Today</h3>
-              <p className="text-2xl">15</p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white p-4 rounded-md shadow-md">
+            <h3 className="text-lg font-medium mb-2">Total Users</h3>
+            <p className="text-2xl">{users.length}</p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div className="bg-white p-4 rounded-md shadow-md">
-              <h3 className="text-lg font-medium mb-2">User Growth</h3>
-              <BarChart width={400} height={200} data={data}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Bar dataKey="users" fill="#8884d8" />
-              </BarChart>
-            </div>
-            <div className="bg-white p-4 rounded-md shadow-md">
-              <h3 className="text-lg font-medium mb-2">Schedule</h3>
-              <Calendar onChange={setCalendarValue} value={calendarValue} />
-            </div>
+          <div className="bg-white p-4 rounded-md shadow-md">
+            <h3 className="text-lg font-medium mb-2">Total Mentors</h3>
+            <p className="text-2xl">{mentors.length}</p>
           </div>
-
-          <div className="bg-white p-6 rounded-md shadow-md mb-8">
-            <h2 className="text-lg font-medium mb-4">Recent Interview Requests</h2>
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 text-left">User</th>
-                  <th className="py-2 px-4 text-left">Position</th>
-                  <th className="py-2 px-4 text-left">Date</th>
-                  <th className="py-2 px-4 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pendingRequests.map((request, index) => (
-                  <tr key={index}>
-                    <td className="py-2 px-4">{request.user}</td>
-                    <td className="py-2 px-4">{request.position}</td>
-                    <td className="py-2 px-4">{request.date}</td>
-                    <td className="py-2 px-4">{request.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="bg-white p-4 rounded-md shadow-md">
+            <h3 className="text-lg font-medium mb-2">Total Co-Admins</h3>
+            <p className="text-2xl">{coAdmins.length}</p>
           </div>
-        {/* </div> */}
+          <div className="bg-white p-4 rounded-md shadow-md">
+            <h3 className="text-lg font-medium mb-2">Total Events</h3>
+            <p className="text-2xl">{events.length}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="bg-white p-4 rounded-md shadow-md">
+            <h3 className="text-lg font-medium mb-2">User Growth</h3>
+            <BarChart width="100%" height={200} data={data}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" />
+              <Bar dataKey="users" fill="#8884d8" />
+            </BarChart>
+          </div>
+          <div className="bg-white p-4 rounded-md shadow-md">
+            <h3 className="text-lg font-medium mb-2">Schedule</h3>
+            <Calendar onChange={setCalendarValue} value={calendarValue} />
+          </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-  export default AdminDashboard;
+export default AdminDashboard;
