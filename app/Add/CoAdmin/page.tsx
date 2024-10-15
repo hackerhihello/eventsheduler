@@ -17,7 +17,7 @@ const CoAdmin = () => {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [showPassword, setShowPassword] = useState({});
+  const [showPassword, setShowPassword] = useState<{ [key: number]: boolean }>({});
   const [viewUser, setViewUser] = useState(null);
 
   // Fetch all co-admins on component mount
