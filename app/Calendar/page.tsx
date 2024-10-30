@@ -38,19 +38,21 @@ export default function Home() {
 
   const fetchEvents = async () => {
     const storedToken = getToken();
-
-    if (!storedToken) {
-      console.error("No token found.");
+    const storedUserId = localStorage.getItem('userId'); // Replace 'userId' with the actual key you're using
+  
+    if (!storedToken || !storedUserId) {
+      console.error("No token or user ID found.");
       return;
     }
-
+  
     try {
-      const eventsData = await getEvents(storedToken);
+      const eventsData = await getEvents(storedToken, storedUserId);
       setAllEvents(eventsData);
     } catch (error) {
       console.error("Error fetching events:", error);
     }
   };
+  
 
   useEffect(() => {
     fetchEvents();
