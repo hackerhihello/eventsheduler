@@ -78,7 +78,7 @@ export default function Home() {
     try {
       const eventData = {
         title: newEvent.title,
-        description: newEvent.description, // Capture from input
+        description: newEvent.description,
         start: newEvent.start.toISOString(),
         end: newEvent.end.toISOString(),
         userId,
