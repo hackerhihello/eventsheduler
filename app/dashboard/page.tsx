@@ -22,7 +22,7 @@ const AdminDashboard: React.FC = () => {
   const [coAdmins, setCoAdmins] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [calendarValue, setCalendarValue] = useState(new Date());
-  const token = "YOUR_AUTH_TOKEN"; // Replace with actual token management
+  const token = localStorage.getItem("token"); // Replace with actual token management
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,7 +53,7 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-grow ml-64 p-6 bg-gray-100 min-h-screen">
+      <div className="flex-grow ml-64 p-6 bg-gray-100 min-h-screen" >
         <h1 className="text-2xl font-bold mb-4 text-center">Admin Dashboard</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
