@@ -25,18 +25,23 @@ const DirectorySqlUsers = () => {
   useEffect(() => {
     const fetchSqlUsers = async () => {
       try {
-        const users: User[] = await fetchUsers(); // Ensure fetchUsers returns User[]
+        const users: User[] = await fetchUsers();
         const sqlUsers = users.filter(user => user.tech === "ReactJs");
         setSqlUsers(sqlUsers);
       } catch (err) {
-        setError(err.message);
+        if (err instanceof Error) {
+          setError(err.message); // Now it's safe to access `err.message`
+        } else {
+          setError("An unknown error occurred");
+        }
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     fetchSqlUsers();
   }, []);
+  
 
   const togglePasswordVisibility = (email: string) => {
     setShowPasswords(prev => ({ ...prev, [email]: !prev[email] }));
