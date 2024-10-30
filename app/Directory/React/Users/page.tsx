@@ -1,13 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchUsers } from '../../../api/userapi'; // Adjust the import path as needed
+import { fetchUsers } from '../../../api/userapi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
+interface User {
+  name: string;
+  email: string;
+  password: string;
+  mentor: string;
+  tech: string;
+}
+
 const DirectorySqlUsers = () => {
-  const [sqlUsers, setSqlUsers] = useState([]);
+  const [sqlUsers, setSqlUsers] = useState<User[]>([]);
   const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
@@ -17,8 +25,7 @@ const DirectorySqlUsers = () => {
   useEffect(() => {
     const fetchSqlUsers = async () => {
       try {
-        const users = await fetchUsers();
-        // Filter users based on SQL technology
+        const users: User[] = await fetchUsers(); // Ensure fetchUsers returns User[]
         const sqlUsers = users.filter(user => user.tech === "ReactJs");
         setSqlUsers(sqlUsers);
       } catch (err) {
