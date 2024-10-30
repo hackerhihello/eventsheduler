@@ -3,9 +3,15 @@
 import { useState } from 'react';
 import Sidebar from '../Sidebar';
 
+interface FormErrors {
+  name?: string;
+  email?: string;
+  message?: string;
+}
+
 const ContactForm = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -13,7 +19,7 @@ const ContactForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let errors: { [key: string]: string } = {};
+    let errors: FormErrors = {};
 
     if (!formData.name) errors.name = "Name is required";
     if (!formData.email) errors.email = "Email is required";
@@ -33,7 +39,7 @@ const ContactForm = () => {
       <div className="flex justify-center items-center h-screen bg-gradient-to-b from-teal-600 to-teal-500">
         <form className="bg-white bg-opacity-90 p-10 rounded-lg shadow-lg w-full max-w-md text-center" onSubmit={handleSubmit}>
           <h2 className="text-2xl text-gray-800 mb-2">Send us a Message</h2>
-          <p className="text-sm text-gray-600 mb-4">We&apos;re here to assist you</p> {/* Escaped apostrophe */}
+          <p className="text-sm text-gray-600 mb-4">We&apos;re here to assist you</p>
           <div className="mb-4">
             <input
               type="text"
