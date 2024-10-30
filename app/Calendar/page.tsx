@@ -9,8 +9,8 @@ import { CSSTransition } from "react-transition-group";
 import { FiAlertTriangle } from "react-icons/fi";
 import Sidebar from "../Sidebar";
 import { createEvent, deleteEvent, getEvents, editEvent } from '../api/events';
-import DatePicker from "react-datepicker"; // Importing DatePicker
-import "react-datepicker/dist/react-datepicker.css"; // Importing CSS for DatePicker
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const localizer = momentLocalizer(moment);
 
@@ -20,6 +20,7 @@ interface Event {
   end: Date;
   _id: string;
   userId?: string;
+  description?: string; // Add this field if needed
 }
 
 export default function Home() {
@@ -32,19 +33,20 @@ export default function Home() {
     start: new Date(),
     end: new Date(),
     _id: "",
+    description: "", // Initialize the description
   });
 
   const getToken = () => localStorage.getItem('authToken');
 
   const fetchEvents = async () => {
     const storedToken = getToken();
-    const storedUserId = localStorage.getItem('userId'); // Replace 'userId' with the actual key you're using
-  
+    const storedUserId = localStorage.getItem('userId');
+
     if (!storedToken || !storedUserId) {
       console.error("No token or user ID found.");
       return;
     }
-  
+
     try {
       const eventsData = await getEvents(storedToken, storedUserId);
       setAllEvents(eventsData);
@@ -52,20 +54,19 @@ export default function Home() {
       console.error("Error fetching events:", error);
     }
   };
-  
 
   useEffect(() => {
     fetchEvents();
   }, []);
 
   const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
-    setNewEvent({ title: "", start: slotInfo.start, end: slotInfo.end, _id: "" });
+    setNewEvent({ title: "", start: slotInfo.start, end: slotInfo.end, _id: "", description: "" });
     setShowModal(true);
   };
 
   const handleEventAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const storedUser = localStorage.getItem('user');
     let userId = '';
 
@@ -75,11 +76,18 @@ export default function Home() {
     }
 
     try {
-      const eventData = { ...newEvent, userId };
-      const savedEvent = await createEvent(eventData, getToken());
+      const eventData = {
+        title: newEvent.title,
+        description: newEvent.description, // Capture from input
+        start: newEvent.start.toISOString(),
+        end: newEvent.end.toISOString(),
+        userId,
+      };
+
+      const savedEvent = await createEvent(eventData, getToken()!);
       setAllEvents([...allEvents, savedEvent]);
       setShowModal(false);
-      setNewEvent({ title: "", start: new Date(), end: new Date(), _id: "" });
+      setNewEvent({ title: "", start: new Date(), end: new Date(), _id: "", description: "" });
     } catch (error) {
       console.error("Error adding event:", error);
     }
@@ -93,8 +101,8 @@ export default function Home() {
   const handleDeleteEvent = async () => {
     if (selectedEvent && selectedEvent._id) {
       try {
-        await deleteEvent(selectedEvent._id, getToken());
-        await fetchEvents(); // Refresh events
+        await deleteEvent(selectedEvent._id, getToken()!);
+        await fetchEvents();
         setShowDeleteModal(false);
         setSelectedEvent(null);
       } catch (error) {
@@ -109,11 +117,11 @@ export default function Home() {
     if (selectedEvent) {
       try {
         const updatedEventData = { ...selectedEvent, ...newEvent };
-        const updatedEvent = await editEvent(selectedEvent._id, updatedEventData, getToken());
+        const updatedEvent = await editEvent(selectedEvent._id, updatedEventData, getToken()!);
         const updatedEvents = allEvents.map((event) => (event._id === updatedEvent._id ? updatedEvent : event));
         setAllEvents(updatedEvents);
         setShowModal(false);
-        setNewEvent({ title: "", start: new Date(), end: new Date(), _id: "" });
+        setNewEvent({ title: "", start: new Date(), end: new Date(), _id: "", description: "" });
         setSelectedEvent(null);
       } catch (error) {
         console.error("Error editing event:", error);
@@ -167,6 +175,13 @@ export default function Home() {
                           value={newEvent.title}
                           onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                           required
+                        />
+                        <input
+                          type="text"
+                          className="border border-gray-300 p-2 w-full rounded focus:ring-4 focus:ring-green-300 mt-2"
+                          placeholder="Description"
+                          value={newEvent.description}
+                          onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                         />
                         <div className="mt-4">
                           <label className="block text-gray-700">Start Time:</label>
