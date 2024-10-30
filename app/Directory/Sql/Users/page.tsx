@@ -6,8 +6,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
+interface User {
+  name: string;
+  email: string;
+  password: string; // Be careful with this in a real app
+  mentor: string;
+  tech: string; // Assuming this field is present
+}
+
 const DirectorySqlUsers = () => {
-  const [sqlUsers, setSqlUsers] = useState([]);
+  const [sqlUsers, setSqlUsers] = useState<User[]>([]);
   const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
@@ -17,12 +25,15 @@ const DirectorySqlUsers = () => {
   useEffect(() => {
     const fetchSqlUsers = async () => {
       try {
-        const users = await fetchUsers();
-        // Filter users based on SQL technology
+        const users: User[] = await fetchUsers(); // Specify the type here
         const sqlUsers = users.filter(user => user.tech === "SQL");
         setSqlUsers(sqlUsers);
       } catch (err) {
-        setError(err.message);
+        if (err instanceof Error) {
+          setError(err.message); // Safely access the error message
+        } else {
+          setError("An unknown error occurred");
+        }
       } finally {
         setIsLoading(false);
       }
