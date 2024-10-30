@@ -63,18 +63,26 @@ export default function Home() {
 
   const handleEventAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+  
     const storedUser = localStorage.getItem('user');
     let userId = '';
-
+  
     if (storedUser) {
       const user = JSON.parse(storedUser);
       userId = user.id; // Access user ID
     }
-
+  
     try {
-      const eventData = { ...newEvent, userId };
-      const savedEvent = await createEvent(eventData, getToken());
+      const eventData = {
+        title: newEvent.title,
+        description: newEvent.description || '', // Ensure description is a string
+        start: newEvent.start.toISOString(), // Optional if backend needs this
+        end: newEvent.end.toISOString(), // Optional if backend needs this
+        userId,
+        date: newEvent.start.toISOString().split('T')[0], // Add date property
+      };
+  
+      const savedEvent = await createEvent(eventData, getToken()!);
       setAllEvents([...allEvents, savedEvent]);
       setShowModal(false);
       setNewEvent({ title: "", start: new Date(), end: new Date(), _id: "" });
@@ -82,6 +90,7 @@ export default function Home() {
       console.error("Error adding event:", error);
     }
   };
+  
 
   const handleSelectEvent = (event: Event) => {
     setSelectedEvent(event);
