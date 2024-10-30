@@ -15,13 +15,15 @@ import {
 import { fetchMentors } from "@/app/api/mentor";
 
 interface UserType {
-  id?: string;
+  id?: string; // You can keep this if your logic depends on it
+  _id?: string; // Add this line
   name: string;
   email: string;
   password: string;
   tech: string;
   mentor: string;
 }
+
 
 const User = () => {
   const { addUser } = useUserMentor();
@@ -323,13 +325,13 @@ const User = () => {
                         View
                       </button>
                       <button
-                        onClick={() => handleEdit(user._id || "")} // Ensure user.id is passed
+                        onClick={() => handleEdit(user.id || "")} // Ensure user.id is passed
                         className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 mr-2"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(user._id || "")} // Ensure user.id is passed
+                        onClick={() => handleDelete(user.id || "")} // Ensure user.id is passed
                         className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
                       >
                         Delete
