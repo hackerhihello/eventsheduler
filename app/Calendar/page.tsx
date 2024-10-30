@@ -82,7 +82,7 @@ export default function Home() {
         start: newEvent.start.toISOString(),
         end: newEvent.end.toISOString(),
         userId,
-        date: newEvent.start.toISOString().split('T')[0], // Assuming date is derived from start
+        date: newEvent.start.toISOString().split('T')[0], // Add the date property here
       };
   
       const savedEvent = await createEvent(eventData, getToken()!);
