@@ -75,17 +75,17 @@ export default function Home() {
     try {
       const eventData = {
         title: newEvent.title,
-        description: newEvent.description || '', // Ensure description is a string
-        start: newEvent.start.toISOString(), // Optional if backend needs this
-        end: newEvent.end.toISOString(), // Optional if backend needs this
+        description: newEvent.description, // Include description if needed
+        start: newEvent.start.toISOString(), // Ensure it's in the correct format
+        end: newEvent.end.toISOString(), // Ensure it's in the correct format
         userId,
-        date: newEvent.start.toISOString().split('T')[0], // Add date property
+        date: newEvent.start.toISOString().split('T')[0], // Extract date from start
       };
   
-      const savedEvent = await createEvent(eventData, getToken()!);
+      const savedEvent = await createEvent(eventData, getToken());
       setAllEvents([...allEvents, savedEvent]);
       setShowModal(false);
-      setNewEvent({ title: "", start: new Date(), end: new Date(), _id: "" });
+      setNewEvent({ title: "", start: new Date(), end: new Date(), _id: "", description: "" });
     } catch (error) {
       console.error("Error adding event:", error);
     }
